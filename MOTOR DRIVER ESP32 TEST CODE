@@ -1,0 +1,64 @@
+#include <Arduino.h>
+#include "BluetoothSerial.h"
+BluetoothSerial SerialBT;
+
+int IN1 = 14;
+int IN2 = 27;
+int IN3 = 13;
+int IN4 = 12;
+
+void setup() {
+    Serial.begin(115200);
+    SerialBT.begin("ESP32_BT"); // Bluetooth device name
+    Serial.println("The device started, now you can pair it with Bluetooth!");
+    
+    pinMode(IN1, OUTPUT);
+    pinMode(IN2, OUTPUT);
+    pinMode(IN3, OUTPUT);
+    pinMode(IN4, OUTPUT);
+}
+void loop (){
+if(SerialBT.available()){
+    char command = SerialBT.read();
+
+    if (command == 'L'){
+        Serial.println("Moving forward");
+        digitalWrite(IN1, LOW);
+        digitalWrite(IN2, LOW);
+        digitalWrite(IN3, HIGH);
+        digitalWrite(IN4, LOW);
+    }
+    else if (command == 'R')
+    {
+        Serial.println("Moving backward");
+        digitalWrite(IN1, LOW);
+        digitalWrite(IN2, HIGH);
+        digitalWrite(IN3, LOW);
+        digitalWrite(IN4, LOW);
+    }
+    else if (command == 'S')
+    {
+        Serial.println("Stopping");
+        digitalWrite(IN1, LOW);
+        digitalWrite(IN2, LOW);
+        digitalWrite(IN3, LOW);
+        digitalWrite(IN4, LOW);
+    }
+else if (command == 'A')
+    {
+        Serial.println("REVERSING MOTOR 1");
+        digitalWrite(IN1, LOW);
+        digitalWrite(IN2, LOW);
+        digitalWrite(IN3, LOW);
+        digitalWrite(IN4, HIGH);
+    }
+   else if (command == 'B')
+    {
+        Serial.println("reversing motor 2");
+        digitalWrite(IN1, HIGH);
+        digitalWrite(IN2, LOW);
+        digitalWrite(IN3, LOW);
+        digitalWrite(IN4, LOW);
+    }            
+}
+}
