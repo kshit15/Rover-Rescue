@@ -1,0 +1,41 @@
+const int esc1 = 13;
+const int esc2 = 15;
+
+
+void setup() {
+  ledcAttachPin(esc1, 0);
+  ledcAttachPin(esc2, 1);
+
+
+  ledcSetup(0, 50, 16); // 50Hz, 16-bit
+  ledcSetup(1, 50, 16);
+
+  delay(3000); // Wait for ESCs to arm
+}
+
+void loop() {
+  int minDuty = 3277;  // ~1000us
+  int midDuty = 4915;  // ~1500us (moderate throttle)
+
+  // Motor 1
+  ledcWrite(0, midDuty);
+  delay(2000);
+  ledcWrite(0, minDuty);
+  delay(1000);
+
+  // Motor 2
+  ledcWrite(1, minDuty);
+  delay(2000);
+  ledcWrite(1, midDuty);
+  delay(1000);
+  // All motors
+  ledcWrite(0, midDuty);
+  ledcWrite(1, midDuty);
+  delay(5000);
+
+  // Stop all
+  ledcWrite(0, minDuty);
+  ledcWrite(1, minDuty);
+
+  while (1) delay(1000); // Stop loop
+}
