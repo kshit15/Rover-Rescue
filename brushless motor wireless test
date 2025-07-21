@@ -1,0 +1,46 @@
+#include <Arduino.h>
+#include "BluetoothSerial.h"
+// Super simple brushless motor test using ESP32
+// Assumes ESCs are connected to GPIOs 18, 19, 21, 22
+// Sends basic PWM to each motor one by one, then all together
+BluetoothSerial BT;
+
+int motorPins[4] = {15, 2, 27, 18};
+int motorChannels[4] = {0, 1, 2, 3};
+
+int minThrottle = 1000; // Arming signal
+int runThrottle = 1500; // Fixed throttle
+
+int escPulse(int microseconds) {
+  return map(microseconds, 1000, 2000, 3276, 6553);
+}
+
+void setup() {
+  BT.begin("ESP32-Motors");
+  for (int i = 0; i < 4; i++) {
+    ledcSetup(motorChannels[i], 50, 16);
+    ledcAttachPin(motorPins[i], motorChannels[i]);
+    ledcWrite(motorChannels[i], escPulse(minThrottle)); // Send arm signal
+  }
+}
+
+void loop() {
+  if (BT.available()) {
+    char cmd = BT.read();
+
+    if (cmd == 'a') {
+      ledcWrite(0, escPulse(runThrottle)); // Motor 1
+    } else if (cmd == 'b') {
+      ledcWrite(1, escPulse(runThrottle)); // Motor 2
+    } else if (cmd == 'c') {
+      ledcWrite(2, escPulse(runThrottle)); // Motor 3
+    } else if (cmd == 'd') {
+      ledcWrite(3, escPulse(runThrottle)); // Motor 4
+    } else if (cmd == 's') {
+      // Stop all motors
+      for (int i = 0; i < 4; i++) {
+        ledcWrite(i, escPulse(minThrottle));
+      }
+    }
+  }
+}
